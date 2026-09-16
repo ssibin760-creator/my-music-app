@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Music App</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #121212;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .app {
+      width: 360px;
+      background: #1e1e1e;
+      border-radius: 25px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .cover {
+      width: 250px;
+      height: 250px;
+      margin: auto;
+      border-radius: 20px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .song-info {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .song-info h2 {
+      font-size: 22px;
+    }
+
+    .song-info p {
+      color: #aaa;
+      margin-top: 8px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      margin: 15px 0;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 25px;
+      margin-top: 15px;
+    }
+
+    button {
+      border: none;
+      background: #333;
+      color: white;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .play {
+      width: 65px;
+      height: 65px;
+      background: #1db954;
+      font-size: 25px;
+    }
+
+    button:hover {
+      transform: scale(1.08);
+    }
+
+    .volume {
+      margin-top: 20px;
+    }
+
+    .volume label {
+      display: block;
+      margin-bottom: 5px;
+      color: #aaa;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+
+    <h1>🎵 My Music</h1>
+
+    <img
+      class="cover"
+      src="https://picsum.photos/500"
+      alt="Album Cover"
+    >
+
+    <div class="song-info">
+      <h2 id="title">My Song</h2>
+      <p id="artist">My Artist</p>
+    </div>
+
+    <input type="range" id="progress" value="0">
+
+    <div class="buttons">
+      <button onclick="previousSong()">⏮</button>
+      <button class="play" onclick="playPause()" id="playBtn">▶</button>
+      <button onclick="nextSong()">⏭</button>
+    </div>
+
+    <div class="volume">
+      <label>🔊 Volume</label>
+      <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
+    </div>
+
+    <audio id="audio"></audio>
+
+  </div>
+
+<script>
+
+const songs = [
+  {
+    title: "Song One",
+    artist: "Artist One",
+    src: "songs/song1.mp3"
+  },
+  {
+    title: "Song Two",
+    artist: "Artist Two",
+    src: "songs/song2.mp3"
+  },
+  {
+    title: "Song Three",
+    artist: "Artist Three",
+    src: "songs/song3.mp3"
+  }
+];
+
+let currentSong = 0;
+
+const audio = document.getElementById("audio");
+const title = document.getElementById("title");
+const artist = document.getElementById("artist");
+const playBtn = document.getElementById("playBtn");
+const progress = document.getElementById("progress");
+const volume = document.getElementById("volume");
+
+function loadSong() {
+  title.textContent = songs[currentSong].title;
+  artist.textContent = songs[currentSong].artist;
+  audio.src = songs[currentSong].src;
+  progress.value = 0;
+}
+
+function playPause() {
+
+  if (audio.paused) {
+    audio.play();
+    playBtn.textContent = "⏸";
+  } else {
+    audio.pause();
+    playBtn.textContent = "▶";
+  }
+
+}
+
+function nextSong() {
+
+  currentSong++;
+
+  if (currentSong >= songs.length) {
+    currentSong = 0;
+  }
+
+  loadSong();
+  audio.play();
+  playBtn.textContent = "⏸";
+}
+
+function previousSong() {
+
+  currentSong--;
+
+  if (currentSong < 0) {
+    currentSong = songs.length - 1;
+  }
+
+  loadSong();
+  audio.play();
+  playBtn.textContent = "⏸";
+}
+
+audio.addEventListener("timeupdate", () => {
+
+  if (audio.duration) {
+    progress.value =
+      (audio.currentTime / audio.duration) * 100;
+  }
+
+});
+
+progress.addEventListener("input", () => {
+
+  if (audio.duration) {
+    audio.currentTime =
+      (progress.value / 100) * audio.duration;
+  }
+
+});
+
+volume.addEventListener("input", () => {
+  audio.volume = volume.value;
+});
+
+audio.addEventListener("ended", nextSong);
+
+loadSong();
+
+</script>
+
+</body>
+</html>
